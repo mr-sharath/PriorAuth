@@ -1,0 +1,12 @@
+streamlit
+langgraph
+langchain
+langchain-community
+pandas
+numpy
+scikit-learn
+plotly
+python-dotenv
+pydantic
+typing-extensions
+regex
