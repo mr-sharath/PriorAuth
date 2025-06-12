@@ -1,7 +1,4 @@
 from typing import Dict, List, Any
-import re
-import json
-from langchain.schema import BaseMessage, HumanMessage, AIMessage
 
 class MedicalExtractorAgent:
     """Lightweight medical information extractor using rule-based NLP"""

@@ -1,12 +1,9 @@
 streamlit
 langgraph
-langchain
-langchain-community
 pandas
-numpy
-scikit-learn
 plotly
 python-dotenv
-pydantic
-typing-extensions
-regex
+# Optional dependencies for development
+pytest>=7.0.0
+black>=23.0.0
+isort>=5.12.0
