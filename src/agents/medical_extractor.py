@@ -3,7 +3,7 @@ from transformers import pipeline
 import torch
 
 class MedicalExtractorAgent:
-    """Lightweight medical information extractor using rule-based NLP"""
+    """Lightweight medical information extractor using rule-based NLP and BioMedicalNER"""
     
     def __init__(self):
         # Use a model fine-tuned for medical NER
@@ -26,6 +26,34 @@ class MedicalExtractorAgent:
                 'headache', 'nausea', 'dizziness', 'swelling'
             ]
         }
+
+    def postprocess_bert_entities(entities):
+        merged_entities = []
+        current = None
+        for ent in entities:
+            word = ent["word"]
+            # Remove leading hashes in subwords
+            if word.startswith("##"):
+                word = word[2:]
+            if current and ent["entity_group"] == current["entity_group"] and ent["start"] == current["end"]:
+                # Merge with previous
+                current["word"] += word
+                current["score"] = max(current["score"], ent["score"])
+                current["end"] = ent["end"]
+            else:
+                # Start new entity
+                if current:
+                    # Only keep if not a short fragment
+                    if len(current["word"].replace(" ", "")) > 2:
+                        merged_entities.append(current)
+                current = ent.copy()
+                current["word"] = word
+        if current and len(current["word"].replace(" ", "")) > 2:
+            merged_entities.append(current)
+        # Optionally, capitalize and strip
+        for ent in merged_entities:
+            ent["word"] = ent["word"].strip().capitalize()
+        return merged_entities
     
     def extract_medical_info(self, patient_data: Dict) -> Dict:
         """Extract and structure medical information from patient data"""
@@ -58,6 +86,7 @@ class MedicalExtractorAgent:
         clinical_note = patient_data.get('clinical_note', '')
         if clinical_note:
             entities = self.ner_pipeline(clinical_note)
+            entities = self.postprocess_bert_entities(entities)
             diagnosis = [e['word'] for e in entities if e['entity_group'] in ('DISEASE', 'DISORDER')]
             medications = [e['word'] for e in entities if e['entity_group'] in ('CHEMICAL', 'DRUG')]
             extracted_info['bert_entities'] = entities
