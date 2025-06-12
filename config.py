@@ -92,7 +92,8 @@ class Config:
             "insurance_tier": "Tier 4",
             "prior_auth_history": "None",
             "cost_per_month": 2500,
-            "urgency": "Routine"
+            "urgency": "Routine",
+            "clinical_note": "Patient with Rheumatoid Arthritis started on Adalimumab after Methotrexate. NKDA."
         },
         {
             "patient_id": "PT000002", 
@@ -109,7 +110,8 @@ class Config:
             "insurance_tier": "Tier 3",
             "prior_auth_history": "Approved",
             "cost_per_month": 850,
-            "urgency": "Urgent"
+            "urgency": "Urgent",
+            "clinical_note": "Patient with Type 2 Diabetes started on Semaglutide after Metformin and Insulin. Sulfa allergy."
         },
         {
             "patient_id": "PT000003",
@@ -126,7 +128,8 @@ class Config:
             "insurance_tier": "Tier 4", 
             "prior_auth_history": "Denied",
             "cost_per_month": 3200,
-            "urgency": "Emergency"
+            "urgency": "Emergency",
+            "clinical_note": "Patient with Asthma started on Dupilumab after Albuterol and Fluticasone. No allergies."
         }
     ]
     

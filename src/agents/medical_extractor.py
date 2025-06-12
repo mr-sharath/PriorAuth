@@ -1,9 +1,17 @@
 from typing import Dict, List, Any
+from transformers import pipeline
+import torch
 
 class MedicalExtractorAgent:
     """Lightweight medical information extractor using rule-based NLP"""
     
     def __init__(self):
+        # Use a model fine-tuned for medical NER
+        self.ner_pipeline = pipeline(
+            "ner",
+            model="d4data/biomedical-ner-all",
+            aggregation_strategy="simple"
+        )
         self.medical_terms = {
             'conditions': [
                 'diabetes', 'hypertension', 'arthritis', 'asthma', 'copd',
@@ -46,7 +54,20 @@ class MedicalExtractorAgent:
                 'estimated_cost': patient_data.get('cost_per_month', 0)
             }
         }
-        
+        # NEW: If clinical note exists, use BERT
+        clinical_note = patient_data.get('clinical_note', '')
+        if clinical_note:
+            entities = self.ner_pipeline(clinical_note)
+            diagnosis = [e['word'] for e in entities if e['entity_group'] in ('DISEASE', 'DISORDER')]
+            medications = [e['word'] for e in entities if e['entity_group'] in ('CHEMICAL', 'DRUG')]
+            extracted_info['bert_entities'] = entities
+            extracted_info['diagnosis_bert'] = diagnosis
+            extracted_info['medications_bert'] = medications
+            # Optionally, merge with main fields if empty
+            if not extracted_info['medical_history']['primary_diagnosis'] and diagnosis:
+                extracted_info['medical_history']['primary_diagnosis'] = diagnosis[0]
+            if not extracted_info['current_request']['medication'] and medications:
+                extracted_info['current_request']['medication'] = medications[0]
         return extracted_info
     
     def process(self, state: Dict) -> Dict:
@@ -56,7 +77,7 @@ class MedicalExtractorAgent:
         
         state['extracted_evidence'] = extracted_info
         state['reasoning_chain'] = state.get('reasoning_chain', [])
-        state['reasoning_chain'].append("Medical information extracted and structured")
+        state['reasoning_chain'].append("Medical info extracted (BERT applied if clinical note provided)")
         
         return state
         

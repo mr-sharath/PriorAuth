@@ -122,7 +122,9 @@ class DataLoader:
                                         weights=[80, 15, 5])[0],
                 'provider_name': f'Dr. {random.choice(["Smith", "Johnson", "Williams", "Brown", "Jones"])}',
                 'submission_date': (datetime.now() - timedelta(days=random.randint(0, 30))).strftime('%Y-%m-%d'),
-                'member_id': f'MBR{random.randint(100000, 999999)}'
+                'member_id': f'MBR{random.randint(100000, 999999)}',
+                # Add a clinical note (simple or patterned)
+                'clinical_note': f"Patient with {scenario['diagnosis']} on {random.choice(scenario['medications'])}. Prior treatments: {', '.join(random.sample(scenario['medications'], min(2, len(scenario['medications']))))}. Allergies: {random.choice(scenario['common_allergies'])}."
             }
             patients.append(patient)
         

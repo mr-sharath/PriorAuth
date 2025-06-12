@@ -3,6 +3,7 @@ langgraph
 pandas
 plotly
 python-dotenv
+transformers
 # Optional dependencies for development
 pytest>=7.0.0
 black>=23.0.0

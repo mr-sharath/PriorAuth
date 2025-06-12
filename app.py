@@ -57,9 +57,11 @@ def display_patient_selector():
         # Display patient table
         st.write("**Available Patients:**")
         
-        # Create a simplified view for selection
-        display_df = df[['patient_id', 'name', 'age', 'diagnosis', 'requested_medication', 'urgency']].copy()
-        
+        # Robust column selection
+        cols = ['patient_id', 'name', 'age', 'diagnosis', 'requested_medication', 'urgency']
+        if 'clinical_note' in df.columns:
+            cols.append('clinical_note')
+        display_df = df[cols].copy()        
         # Add selection column
         display_df['Select'] = False
         
@@ -107,6 +109,7 @@ def display_patient_selector():
             duration = st.text_input("Duration", value="6 months")
             urgency = st.selectbox("Urgency", ["Routine", "Urgent", "Emergency"])
             insurance_tier = st.selectbox("Insurance Tier", ["Tier 1", "Tier 2", "Tier 3", "Tier 4"])
+            clinical_note = st.text_area("Clinical Note", value="Patient has been on Methotrexate for 6 months.")
         
         # Additional fields
         previous_treatments = st.text_area("Previous Treatments (comma-separated)", value="Methotrexate")
@@ -129,7 +132,8 @@ def display_patient_selector():
             'insurance_tier': insurance_tier,
             'prior_auth_history': 'None',
             'cost_per_month': cost_per_month,
-            'urgency': urgency
+            'urgency': urgency,
+            'clinical_note': clinical_note
         }
         
         return patient_data
@@ -293,6 +297,13 @@ def display_decision_result(result):
         if financial_risk:
             st.write(f"**Financial Risk:** {financial_risk.get('financial_risk', 'Unknown')}")
             st.write(f"**Monthly Cost:** ${financial_risk.get('estimated_monthly_cost', 0):,}")
+    # After showing structured results:
+    with st.expander("BERT NER Entities (if any)"):
+        bert_entities = result.get('extracted_evidence', {}).get('bert_entities', [])
+        if bert_entities:
+            st.write(pd.DataFrame(bert_entities))
+        else:
+            st.write("No BERT entities extracted.")
     
     # Recommendations
     recommendations = final_decision.get('recommendations', [])
