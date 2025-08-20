@@ -2,8 +2,7 @@
 
 from typing import Dict, List, Any, TypedDict
 from langgraph.graph import StateGraph
-from langgraph.graph.graph import END
-
+from langgraph.graph import END
 from agents.medical_extractor import MedicalExtractorAgent
 from agents.guidelines_checker import GuidelinesCheckerAgent
 from agents.risk_assessor import RiskAssessorAgent
